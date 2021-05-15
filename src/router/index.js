@@ -1,12 +1,18 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import LogEVM from '@/views/LogEVM.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
+    name: 'LogEVM',
+    component: LogEVM
+  },
+  {
+    path: '/home',
     name: 'Home',
     component: Home
   },

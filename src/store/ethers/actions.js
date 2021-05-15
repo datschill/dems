@@ -129,5 +129,11 @@ export default {
       // }
     }
     ctx.commit('initialized', true)
+  },
+  async connectWallet(ctx) {
+    await ctx.dispatch('connect')
+  },
+  async disconnectWallet(ctx) {
+    await ctx.dispatch('disconnect')
   }
 }

@@ -1,14 +1,32 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+    <nav-bar
+      title="dEMS">
+      <account-block></account-block>
+    </nav-bar>
     <router-view/>
   </div>
 </template>
 
+<script>
+import NavBar from '@/components/NavBar.vue'
+import AccountBlock from '@/components/AccountBlock.vue'
+
+export default {
+  name: 'Home',
+  components: {
+    NavBar,
+    AccountBlock
+  },
+  mounted() {
+
+  }
+}
+</script>
+
 <style>
+@import './assets/styles/index.css';
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -17,7 +35,7 @@
   color: #2c3e50;
 }
 
-#nav {
+/* #nav {
   padding: 30px;
 }
 
@@ -28,5 +46,5 @@
 
 #nav a.router-link-exact-active {
   color: #42b983;
-}
+} */
 </style>
