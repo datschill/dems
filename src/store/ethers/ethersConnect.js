@@ -3,6 +3,7 @@ import Vue from 'vue'
 import {
   providers,
   Contract as ContractModule,
+  Interface as InterfaceModule,
   utils as utilsModule
 } from 'ethers'
 

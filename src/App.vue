@@ -2,7 +2,7 @@
   <div id="app">
     <nav-bar
       title="dEMS">
-      <account-block></account-block>
+        <account-block></account-block>
     </nav-bar>
     <router-view/>
   </div>
