@@ -1,14 +1,18 @@
 <template>
     <div class="content-wrapper">
         <new-pairs></new-pairs>
+        <all-pairs></all-pairs>
     </div>
 </template>
 
 <script>
 import NewPairs from '@/components/NewPairs.vue'
+import AllPairs from '@/components/AllPairs.vue'
+
 export default {
     components: {
-        NewPairs
+        NewPairs,
+        AllPairs
     }
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
     <div class="card text-center">
         <div class="card-body">
-            <div class="card-title" @click="fetch">New Pairs</div>
+            <div class="card-title" @click="fetch">All Pairs</div>
             <div class="table-sticky-header">
                 <table class="table table-dark">
                     <thead class="thead-light">
@@ -51,10 +51,11 @@ import moment from 'moment'
 export default {
     methods: {
         ...mapActions('factory', [
-            'subscribePairCreated'
+            'subscribePairCreated',
+            'retrieveAllPairs'
         ]),
         async fetch() {
-            await this.subscribePairCreated()
+            await this.retrieveAllPairs()
         },
         pairDate(time) {
             return moment(time).format('hh:mm')
@@ -186,7 +187,7 @@ export default {
     max-width: 55px !important;
 }
 .tokenName {
-    /* width: 165px; */
+    /* min-width: 165px; */
 }
 .tokenName, .tokenSymbol {
     overflow: hidden;
@@ -203,8 +204,4 @@ export default {
     height: 20px;
     margin: 0 2px;
 }
-/* 
-.table-dark td, .table-dark th, .table-dark thead th {
-    border-color: #454d55;
-} */
 </style>
