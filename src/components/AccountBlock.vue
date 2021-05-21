@@ -1,11 +1,9 @@
 <template>
     <div>
-        <a v-if="!isConnected" @click="connect" class="account-button connect-button">Connect</a>
-        <div v-else>
-            <a @click="disconnect" class="account-button connected-button">
-                <span>{{ address }}</span>
-            </a>
-        </div>
+        <a v-if="!isConnected" @click="connect" class="button connect-button">Connect</a>
+        <a v-else @click="disconnect" class="button connected-button">
+            <span>{{ address }}</span>
+        </a>
     </div>
 </template>
 
@@ -35,24 +33,10 @@ export default {
 </script>
 
 <style scoped>
-.account-button {
-    padding: 5px 10px;
-    height: 40px;
-    border-radius: 20px;
-    user-select: none;
-    cursor: pointer;
-}
-
-.connect-button {
-    border: 2px solid #7158e2;
-}
 .connect-button:hover {
     color: #0be881;
 }
 
-.connected-button {
-    border: 2px solid #7158e2;
-}
 .connected-button span {
     font-size: 0.8rem;
 }

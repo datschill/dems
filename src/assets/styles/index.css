@@ -16,3 +16,12 @@ a {
 .text-center {
     text-align: center!important;
 }
+
+.button {
+    padding: 5px 10px;
+    height: 40px;
+    border-radius: 20px;
+    user-select: none;
+    cursor: pointer;
+    border: 2px solid #7158e2;
+}

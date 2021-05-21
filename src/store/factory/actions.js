@@ -3,19 +3,26 @@ import {
   Contract,
   utils,
   getProvider,
+  getDefaultProvider,
 } from '../ethers/ethersConnect'
 import PancakeFactoryV2 from '@/config/abi/PancakeFactoryV2'
 import erc20 from '@/config/abi/erc20'
 import PancakePair from '@/config/abi/PancakePair'
+import PancakeRouterV2 from '@/config/abi/PancakeRouterV2'
 import { multicall, multicallChain, multicallParallelChain } from '@/utils/multicall'
+import BigNumber from 'bignumber.js'
 
 const addressFactoryV2 = '0xca143ce32fe78f1f7019d7d551a6402fc5350c73' // TODO : Put elsewhere
+const addressRouterV2 = '0x10ed43c718714eb63d5aa57b78b54704e256024e'
 const outputTokenAddress = [
   '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c', // WBNB
   '0x55d398326f99059ff775485246999027b3197955', // BUSD
   '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82' // CAKE
 ]
-const maxCallMulticall = 1000
+const dosAddress = '0x80078c884c69a081e3cfb62bfb828155daefeecb'
+const pairBNBBUSDT = '0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae'
+const decimals = 18
+const customProvider = getDefaultProvider('https://bsc-dataseed1.ninicoin.io/', 'https://bsc-dataseed1.binance.org:443')
 
 function fetchPairs() {
   const factoryContract = new Contract(addressFactoryV2, PancakeFactoryV2, getProvider())
@@ -24,7 +31,7 @@ function fetchPairs() {
     let nbPairs = parseInt(allPairsLength.toLocaleString())
     console.log('nbPairs ', nbPairs)
 
-    nbPairs = 5000
+    nbPairs = 2000
 
     let calls = [...Array(nbPairs)].map((x, index) => {
       return {
@@ -108,6 +115,121 @@ function fetchTokensDetails(tokensAddress) {
 }
 
 export default {
+  async retrieveLastSwap(ctx) {
+    let erc20Interface = new utils.Interface(erc20)
+    let pairInterface = new utils.Interface(PancakePair)
+
+    let provider = getProvider()
+    provider.getBlockNumber()
+    .then(blockNumber => {
+      console.log('blockNumber :', blockNumber)
+      let secondsPerBlock = 3
+      let lastHourBlock = 2 * 60 / secondsPerBlock
+      let fromBlock = blockNumber - lastHourBlock
+      console.log('fromBlock', fromBlock)
+      let topicSwap = 'Swap(address,uint256,uint256,uint256,uint256,address)'
+      let topicApprove = 'Approval(address,address,uint256)'
+      let topicSync = 'Sync(uint112,uint112)'
+      console.log('event topic :', pairInterface.events)
+      return provider.getLogs({
+        fromBlock,
+        toBlock: 'latest',
+        topics: [
+          [utils.id(topicSync),
+          utils.id(topicSwap)]
+        ]
+      })
+    })
+    .then(logs => {
+      // console.log('logs', logs)
+      let cleanLogs = logs.map(log => pairInterface.parseLog(log))
+      console.log('logs', cleanLogs)
+      // logs.forEach((log) => {
+      //     console.log(erc20Interface.parseLog(log));
+      // });
+    })
+  },
+  async retrieveBNBprice(ctx) {
+    let BNB = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'
+    let BUSDT = '0x55d398326f99059ff775485246999027b3197955'
+    let DHANDS = '0xb6f23715139fb7d7870ee778dd700df8e19a3788'
+    console.log('customProvider', customProvider)
+    const routerContract = new Contract(addressRouterV2, PancakeRouterV2, customProvider)
+
+    let amountBNB = utils.parseUnits('1', decimals);
+    // let amountBNB = new BigNumber(1).multipliedBy(new BigNumber(10).pow(decimals))
+    // new BigNumber(balance.toHexString()).dividedBy(new BigNumber(10).pow(token.tokenDecimals)).toNumber()
+    console.log('amountBNB', amountBNB)
+    routerContract.getAmountsOut(amountBNB, [BNB, BUSDT], {blockTag:7528423})
+    .then(amountsOut => {
+      console.log('amountsOut', amountsOut)
+      var stringBNB = utils.formatUnits(amountsOut[0], decimals);
+      var stringBUSDT = utils.formatUnits(amountsOut[1], decimals);
+      console.log('stringBNB', stringBNB)
+      console.log('stringBUSDT', stringBUSDT)
+    })
+
+    // let calls = [
+    //   {
+    //     address: pairBNBBUSDT,
+    //     name: 'getReserves',
+    //   }
+    // ]
+    // return multicallChain(PancakePair, calls)
+    // .then(reserves => {
+    //   console.log('reserves BNB/BUSDT', reserves)
+    // })
+  },
+  async testBuySellShitcoin(ctx) {
+    let WBNB = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'
+    let BUSDT = '0x55d398326f99059ff775485246999027b3197955'
+    let pair = '0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae'
+    const routerContract = new Contract(addressRouterV2, PancakeRouterV2, getProvider().getSigner())
+    const pairContract = new Contract(pair, PancakePair, getProvider().getSigner())
+    const BUSDTContract = new Contract(BUSDT, erc20, getProvider().getSigner())
+
+    let bigAmountToken = utils.parseUnits('100', decimals)
+    
+    // BUSDTContract.approve(addressRouterV2, bigAmountToken)
+    // .then(approveResult => {
+    //   console.log('approveResult', approveResult)
+    //   return approveResult.wait()
+    // })
+    // .then(confirmations => {
+    //   console.log('approveResult wait confirmations', confirmations)
+    //   let amountBNB = utils.parseUnits('0.002', decimals);
+    //   console.log('amountBNB', amountBNB)
+    //   return routerContract.getAmountsOut(amountBNB, [WBNB, BUSDT])
+    // })
+    let amountBNB = utils.parseUnits('0.002', decimals);
+    console.log('amountBNB', amountBNB)
+    routerContract.getAmountsOut(amountBNB, [WBNB, BUSDT])
+    .then(amountsOut => {
+      console.log('amountsOut', amountsOut)
+      var stringBNB = utils.formatUnits(amountsOut[0], decimals);
+      var stringBUSDT = utils.formatUnits(amountsOut[1], decimals);
+      console.log('stringBNB', stringBNB)
+      console.log('stringBUSDT', stringBUSDT)
+
+
+      let busdtAmountBefore = parseFloat(stringBUSDT) * 0.95 // 5% slippage
+      console.log('busdtAmountBefore', busdtAmountBefore)
+      let deadline = Date.now() + (3 * 10 * 1000)
+      let amountBNBBis = utils.parseUnits('0.002', decimals);
+      let amountBUSD = utils.parseUnits(String(busdtAmountBefore), decimals)
+
+      return routerContract.swapExactETHForTokens(amountBUSD, [WBNB, BUSDT], dosAddress, deadline, {value:amountBNBBis})
+    })
+    .then(swapResult => {
+      console.log('swapResult', swapResult)
+      return swapResult.wait()
+    })
+    .then(confirmations => {
+      console.log('swapExactETHForTokens wait confirmations', confirmations)
+
+      // TODO : Sell
+    })
+  },
   async subscribePairCreated(ctx) {
     const factoryContract = new Contract(addressFactoryV2, PancakeFactoryV2, getProvider())
     console.log('subscribePairCreated', factoryContract)

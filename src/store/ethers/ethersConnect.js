@@ -4,7 +4,8 @@ import {
   providers,
   Contract as ContractModule,
   Interface as InterfaceModule,
-  utils as utilsModule
+  utils as utilsModule,
+  getDefaultProvider as getDefaultProviderModule
 } from 'ethers'
 
 export const PROVIDER_CHECK_MS = 500
@@ -27,6 +28,7 @@ export const event = new Vue()
 // expose ethers modules
 export const utils = utilsModule
 export const Contract = ContractModule
+export const getDefaultProvider = getDefaultProviderModule
 
 // ethereum transactions to log
 // More information: https://docs.ethers.io/ethers.js/html/api-providers.html#events
